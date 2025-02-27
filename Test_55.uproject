@@ -34,10 +34,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "Quest",
-			"Enabled": false
-		},
-		{
 			"Name": "GameplayStateTree",
 			"Enabled": true
 		}
