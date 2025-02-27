@@ -12,10 +12,11 @@
 # Do not ignore current project's `.uproject`________
 !/*.uproject
 
-# Do not ignore source, config and plugins dirs________
+# Do not ignore source, config, plugins and hooks dirs________
 !/Source/**
 !/Config/**
 !/Plugins/**
+!/Hooks/**
 
 # Only allow .uasset and .umap files from /Content dir________
 # They're tracked by git-lfs, don't forget to track other________

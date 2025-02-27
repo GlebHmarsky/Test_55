@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Post-checkout hook triggered: updating SharedSabmodule..."
+
+$(dirname "$0")/update-plugin-modules

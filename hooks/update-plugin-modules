@@ -1,0 +1,46 @@
+#!/bin/sh
+
+REPO_ROOT=$(git rev-parse --show-toplevel) # Get repo root path
+PLUGIN_DIR_BASE_PATH="$REPO_ROOT/.."
+CONFIG_FILE_BASE_PATH="$(dirname "$0")" # Expecting file next to this. dirname "$0" return a path to this executed file
+
+##
+# update_repository expect 2 arguments
+# 1 - name of a folder repository where update must happen
+# 2 - name of a file with hash that should be applied to repository
+update_repository() {
+  PLUGIN_DIR="$PLUGIN_DIR_BASE_PATH/$1"
+  CONFIG_FILE="$CONFIG_FILE_BASE_PATH/$2"
+
+  if [ -d "$PLUGIN_DIR" ]; then
+    cd "$PLUGIN_DIR"
+
+    # Getting data as commit might be ahead of current state
+    git fetch origin master
+
+    # Checking that config file with hash is exist
+    if [ ! -f "$CONFIG_FILE" ]; then
+      echo "No config hash file found! Updating master branch."
+      git update-ref refs/heads/master origin/master # Update master branch without checkout
+      echo "PluginLibrary master updated!"
+      exit 0
+    fi
+
+    # Getting commit hash
+    TARGET_COMMIT=$(cat "$CONFIG_FILE")
+
+    # Checking that commit exist
+    if git cat-file -e "$TARGET_COMMIT"; then
+      git checkout "$TARGET_COMMIT"
+      echo "PluginLibrary updated to commit $TARGET_COMMIT"
+    else
+      echo "Target commit $TARGET_COMMIT not found! Please check the config file."
+      exit 1
+    fi
+
+  else
+    echo "SharedSubmodule directory not found!"
+  fi
+}
+
+update_repository "PluginsCBD" "plugin_commit_hash.txt"
