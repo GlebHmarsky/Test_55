@@ -43,4 +43,5 @@ update_repository() {
   fi
 }
 
-update_repository "PluginsCBD" "plugin_commit_hash.txt"
+update_repository "PluginsThirdParty" "PluginsThirdParty_commit_hash.txt"
+update_repository "PluginsCBD" "PluginsCBD_commit_hash.txt"
