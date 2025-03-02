@@ -11,7 +11,8 @@ CONFIG_FILE_BASE_PATH="$(dirname "$0")" # Expecting file next to this. dirname "
 update_repository() {
   PLUGIN_DIR="$PLUGIN_DIR_BASE_PATH/$1"
   CONFIG_FILE="$CONFIG_FILE_BASE_PATH/$2"
-
+  
+  echo "Updating repository $PLUGIN_DIR..."  
   if [ -d "$PLUGIN_DIR" ]; then
     cd "$PLUGIN_DIR"
 
@@ -23,7 +24,7 @@ update_repository() {
       echo "No config hash file found! Updating master branch."
       git update-ref refs/heads/master origin/master # Update master branch without checkout
       echo "PluginLibrary master updated!"
-      return 
+      return
     fi
 
     # Getting commit hash
@@ -39,7 +40,7 @@ update_repository() {
     fi
 
   else
-    echo "SharedSubmodule directory not found!"
+    echo "$1 directory not found!"
   fi
 }
 
