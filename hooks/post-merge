@@ -1,5 +1,5 @@
 #!/bin/sh
 
-echo "Post-merge hook triggered: updating SharedSabmodule..."
+echo "Post-merge hook triggered"
 
 $(dirname "$0")/update-plugin-modules
