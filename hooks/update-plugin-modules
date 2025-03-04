@@ -23,7 +23,7 @@ update_repository() {
     if [ ! -f "$CONFIG_FILE" ]; then
       echo "No config hash file found! Updating master branch."
       git update-ref refs/heads/master origin/master # Update master branch without checkout
-      echo "PluginLibrary master updated!"
+      echo "$1 master updated!"
       return
     fi
 
@@ -33,7 +33,7 @@ update_repository() {
     # Checking that commit exist
     if git cat-file -e "$TARGET_COMMIT"; then
       git checkout "$TARGET_COMMIT"
-      echo "PluginLibrary updated to commit $TARGET_COMMIT"
+      echo "$1 updated to commit $TARGET_COMMIT"
     else
       echo "Target commit $TARGET_COMMIT not found! Please check the config file."
       return
