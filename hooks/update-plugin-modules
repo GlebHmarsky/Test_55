@@ -40,7 +40,7 @@ update_repository() {
     fi
 
   else
-    echo "$1 directory not found!"
+    echo "$1 directory not found! Skipping update."
   fi
 }
 

@@ -2,26 +2,27 @@
 
 COMMIT_MSG_FILE=$1
 
-# Получаем список файлов в индексе
+# Getting list of files in index
 FILES_CHANGED=$(git diff --cached --name-status)
 
-# Флаги для тегов
-CPLUSPLUS_MODIFIED=false
+# Flags for tags
 CPLUSPLUS_NEW=false
+CPLUSPLUS_MODIFIED=false
 SM_UPDATED=false
 
-# Разбираем список изменений
+# Breaking down changes
 while IFS= read -r line; do
     STATUS=$(echo "$line" | awk '{print $1}')
     FILE_PATH=$(echo "$line" | awk '{print $2}')
     
     if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
-        if [[ "$STATUS" == "M" || "$STATUS" == "A" ]]; then
-            CPLUSPLUS_MODIFIED=true
-        fi
         if [[ "$STATUS" == "A" ]]; then
             CPLUSPLUS_NEW=true
         fi
+        if [[ "$STATUS" == "M" ]]; then
+            CPLUSPLUS_MODIFIED=true
+        fi
+        
     fi
 
     if [[ "$FILE_PATH" == "**commit_hash.txt" ]]; then
@@ -29,19 +30,23 @@ while IFS= read -r line; do
     fi
 done <<< "$FILES_CHANGED"
 
-# Формируем префиксы
+# Making prefixes
 PREFIX=""
-if $CPLUSPLUS_MODIFIED; then
-    PREFIX="[C++] "
-fi
 if $CPLUSPLUS_NEW; then
     PREFIX="[C++ *Regenerate] "
 fi
-if $SM_UPDATED; then
-    PREFIX="[SM] "
+else if $CPLUSPLUS_MODIFIED; then
+    PREFIX="[C++] "
 fi
 
-# Добавляем префикс к сообщению, если нужно
+if $SM_UPDATED; then
+    PREFIX=PREFIX + " [EPD] "
+fi
+
+# Deleting old prefix if it exist
+sed -i 's/^\[\([^]]*\)\] //g' "$COMMIT_MSG_FILE"
+
+# Add prefix to a message
 if [[ -n "$PREFIX" ]]; then
     sed -i "1s/^/$PREFIX/" "$COMMIT_MSG_FILE"
 fi
