@@ -22,6 +22,8 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	// Super::Tick(DeltaTime);
+
 
 }
 
