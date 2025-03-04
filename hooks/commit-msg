@@ -1,0 +1,47 @@
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+
+# Получаем список файлов в индексе
+FILES_CHANGED=$(git diff --cached --name-status)
+
+# Флаги для тегов
+CPLUSPLUS_MODIFIED=false
+CPLUSPLUS_NEW=false
+SM_UPDATED=false
+
+# Разбираем список изменений
+while IFS= read -r line; do
+    STATUS=$(echo "$line" | awk '{print $1}')
+    FILE_PATH=$(echo "$line" | awk '{print $2}')
+    
+    if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
+        if [[ "$STATUS" == "M" || "$STATUS" == "A" ]]; then
+            CPLUSPLUS_MODIFIED=true
+        fi
+        if [[ "$STATUS" == "A" ]]; then
+            CPLUSPLUS_NEW=true
+        fi
+    fi
+
+    if [[ "$FILE_PATH" == "**commit_hash.txt" ]]; then
+        SM_UPDATED=true
+    fi
+done <<< "$FILES_CHANGED"
+
+# Формируем префиксы
+PREFIX=""
+if $CPLUSPLUS_MODIFIED; then
+    PREFIX="[C++] "
+fi
+if $CPLUSPLUS_NEW; then
+    PREFIX="[C++ *Regenerate] "
+fi
+if $SM_UPDATED; then
+    PREFIX="[SM] "
+fi
+
+# Добавляем префикс к сообщению, если нужно
+if [[ -n "$PREFIX" ]]; then
+    sed -i "1s/^/$PREFIX/" "$COMMIT_MSG_FILE"
+fi
