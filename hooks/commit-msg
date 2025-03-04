@@ -8,45 +8,44 @@ FILES_CHANGED=$(git diff --cached --name-status)
 # Flags for tags
 CPLUSPLUS_NEW=false
 CPLUSPLUS_MODIFIED=false
-SM_UPDATED=false
+EPD_UPDATED=false
 
 # Breaking down changes
 while IFS= read -r line; do
-    STATUS=$(echo "$line" | awk '{print $1}')
-    FILE_PATH=$(echo "$line" | awk '{print $2}')
-    
-    if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
-        if [[ "$STATUS" == "A" ]]; then
-            CPLUSPLUS_NEW=true
-        fi
-        if [[ "$STATUS" == "M" ]]; then
-            CPLUSPLUS_MODIFIED=true
-        fi
-        
-    fi
+  STATUS=$(echo "$line" | awk '{print $1}')
+  FILE_PATH=$(echo "$line" | awk '{print $2}')
 
-    if [[ "$FILE_PATH" == "**commit_hash.txt" ]]; then
-        SM_UPDATED=true
+  if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
+    if [[ "$STATUS" == "A" ]]; then
+      CPLUSPLUS_NEW=true
     fi
-done <<< "$FILES_CHANGED"
+    if [[ "$STATUS" == "M" ]]; then
+      CPLUSPLUS_MODIFIED=true
+    fi
+  fi
+
+  if [[ "$FILE_PATH" == *"commit_hash.txt" ]]; then
+    EPD_UPDATED=true
+  fi
+done <<<"$FILES_CHANGED"
 
 # Making prefixes
 PREFIX=""
+
 if $CPLUSPLUS_NEW; then
-    PREFIX="[C++ *Regenerate] "
-fi
-else if $CPLUSPLUS_MODIFIED; then
-    PREFIX="[C++] "
-fi
-
-if $SM_UPDATED; then
-    PREFIX=PREFIX + " [EPD] "
+  PREFIX+="[C++ *Regenerate] "
+elif $CPLUSPLUS_MODIFIED; then
+  PREFIX+="[C++] "
 fi
 
-# Deleting old prefix if it exist
-sed -i 's/^\[\([^]]*\)\] //g' "$COMMIT_MSG_FILE"
+if $EPD_UPDATED; then
+  PREFIX+="[EPD] "
+fi
 
-# Add prefix to a message
+# Deleting old prefix if it exists
+sed -i 's/^\(\[[^]]*\] \)*//g' "$COMMIT_MSG_FILE"
+
+# Add prefix to a message if needed
 if [[ -n "$PREFIX" ]]; then
-    sed -i "1s/^/$PREFIX/" "$COMMIT_MSG_FILE"
+  sed -i "1s/^/$PREFIX/" "$COMMIT_MSG_FILE"
 fi
