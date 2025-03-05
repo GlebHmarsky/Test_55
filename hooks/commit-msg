@@ -14,10 +14,10 @@ CPLUSPLUS_MODIFIED=false
 EPD_UPDATED=false
 
 # Checking that used could already add tag for a specific thing
-if echo "$USER_COMMIT_MSG" | grep -q "\[C++ \*Regenerate\]"; then
+if echo "$USER_COMMIT_MSG" | grep -qi "\[C++ \*Regenerate\]"; then
   CPLUSPLUS_NEW=true
 fi
-if echo "$USER_COMMIT_MSG" | grep -q "\[C++\]"; then
+if echo "$USER_COMMIT_MSG" | grep -qi "\[C++\]"; then
   CPLUSPLUS_MODIFIED=true
 fi
 
