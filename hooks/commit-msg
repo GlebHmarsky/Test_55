@@ -26,6 +26,7 @@ while IFS= read -r line; do
   STATUS=$(echo "$line" | awk '{print $1}')
   FILE_PATH=$(echo "$line" | awk '{print $2}')
 
+  # For .h and .cpp files it's either new added of modified
   if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
     if [[ "$STATUS" == "A" ]]; then
       CPLUSPLUS_NEW=true
@@ -35,6 +36,12 @@ while IFS= read -r line; do
     fi
   fi
 
+  #For .cs C# files always must regenerate project as it config change
+  if [[ "$FILE_PATH" == *.cs ]]; then
+    CPLUSPLUS_NEW=true
+  fi
+
+  # For hash update as External Plugin Directory
   if [[ "$FILE_PATH" == *"commit_hash.txt" ]]; then
     EPD_UPDATED=true
   fi
