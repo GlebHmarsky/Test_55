@@ -13,7 +13,7 @@ CPLUSPLUS_NEW=false
 CPLUSPLUS_MODIFIED=false
 EPD_UPDATED=false
 
-# Checking that used could already add tag for a specific thing 
+# Checking that used could already add tag for a specific thing
 if echo "$USER_COMMIT_MSG" | grep -q "\[C++ \*Regenerate\]"; then
   CPLUSPLUS_NEW=true
 fi
@@ -28,7 +28,7 @@ while IFS= read -r line; do
 
   if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
     if [[ "$STATUS" == "A" ]]; then
-      CPLUSPLUS_NEW=true      
+      CPLUSPLUS_NEW=true
     fi
     if [[ "$STATUS" == "M" ]]; then
       CPLUSPLUS_MODIFIED=true
