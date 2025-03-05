@@ -2,6 +2,9 @@
 
 COMMIT_MSG_FILE=$1
 
+# Read the existing commit message
+USER_COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
 # Getting list of files in index
 FILES_CHANGED=$(git diff --cached --name-status)
 
@@ -10,6 +13,14 @@ CPLUSPLUS_NEW=false
 CPLUSPLUS_MODIFIED=false
 EPD_UPDATED=false
 
+# Checking that used could already add tag for a specific thing 
+if echo "$USER_COMMIT_MSG" | grep -q "\[C++ \*Regenerate\]"; then
+  CPLUSPLUS_NEW=true
+fi
+if echo "$USER_COMMIT_MSG" | grep -q "\[C++\]"; then
+  CPLUSPLUS_MODIFIED=true
+fi
+
 # Breaking down changes
 while IFS= read -r line; do
   STATUS=$(echo "$line" | awk '{print $1}')
@@ -17,7 +28,7 @@ while IFS= read -r line; do
 
   if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
     if [[ "$STATUS" == "A" ]]; then
-      CPLUSPLUS_NEW=true
+      CPLUSPLUS_NEW=true      
     fi
     if [[ "$STATUS" == "M" ]]; then
       CPLUSPLUS_MODIFIED=true
