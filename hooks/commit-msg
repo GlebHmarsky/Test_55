@@ -54,7 +54,7 @@ if $EPD_UPDATED; then
 fi
 
 # Deleting old prefix if it exists
-sed -i 's/\(\[[^]]*\] \)*//g' "$COMMIT_MSG_FILE"
+sed -i 's/\(\[[^]]*\]\)*//g' "$COMMIT_MSG_FILE"
 
 # Add prefix to a message if needed
 if [[ -n "$PREFIX" ]]; then
