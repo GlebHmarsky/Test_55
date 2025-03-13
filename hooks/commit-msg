@@ -32,7 +32,7 @@ done <<< "$FILES_CHANGED"
 # Формируем префиксы
 PREFIX=""
 if $CPLUSPLUS_MODIFIED; then
-    PREFIX="[C++] "
+    PREFIX="[C++] " 
 fi
 if $CPLUSPLUS_NEW; then
     PREFIX="[C++ *Regenerate] "
