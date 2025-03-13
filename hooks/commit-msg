@@ -49,7 +49,9 @@ done <<<"$FILES_CHANGED"
 
 # Making prefixes
 PREFIX=""
-
+if $CPLUSPLUS_MODIFIED; then
+    PREFIX="[C++] " 
+fi
 if $CPLUSPLUS_NEW; then
   PREFIX+="[C++ *Regenerate] "
 elif $CPLUSPLUS_MODIFIED; then
