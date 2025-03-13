@@ -2,46 +2,72 @@
 
 COMMIT_MSG_FILE=$1
 
-# Получаем список файлов в индексе
+# Read the existing commit message
+USER_COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Getting list of files in index
 FILES_CHANGED=$(git diff --cached --name-status)
 
-# Флаги для тегов
-CPLUSPLUS_MODIFIED=false
+# Flags for tags
 CPLUSPLUS_NEW=false
-SM_UPDATED=false
+CPLUSPLUS_MODIFIED=false
+EPD_UPDATED=false
 
-# Разбираем список изменений
+# Checking that used could already add tag for a specific thing
+if echo "$USER_COMMIT_MSG" | grep -qi "\[C++ \*Regenerate\]"; then
+  CPLUSPLUS_NEW=true
+fi
+if echo "$USER_COMMIT_MSG" | grep -qi "\[C++\]"; then
+  CPLUSPLUS_MODIFIED=true
+fi
+
+# Breaking down changes
 while IFS= read -r line; do
-    STATUS=$(echo "$line" | awk '{print $1}')
-    FILE_PATH=$(echo "$line" | awk '{print $2}')
-    
-    if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
-        if [[ "$STATUS" == "M" || "$STATUS" == "A" ]]; then
-            CPLUSPLUS_MODIFIED=true
-        fi
-        if [[ "$STATUS" == "A" ]]; then
-            CPLUSPLUS_NEW=true
-        fi
-    fi
+  STATUS=$(echo "$line" | awk '{print $1}')
+  FILE_PATH=$(echo "$line" | awk '{print $2}')
 
-    if [[ "$FILE_PATH" == "**commit_hash.txt" ]]; then
-        SM_UPDATED=true
+  # For .h and .cpp files it's either new added of modified
+  if [[ "$FILE_PATH" == *.h || "$FILE_PATH" == *.cpp ]]; then
+    if [[ "$STATUS" == "A" ]]; then
+      CPLUSPLUS_NEW=true
     fi
-done <<< "$FILES_CHANGED"
+    if [[ "$STATUS" == "M" ]]; then
+      CPLUSPLUS_MODIFIED=true
+    fi
+  fi
 
-# Формируем префиксы
+  #For .cs C# files always must regenerate project as it config change
+  if [[ "$FILE_PATH" == *.cs ]]; then
+    CPLUSPLUS_NEW=true
+  fi
+
+  # For hash update as External Plugin Directory
+  if [[ "$FILE_PATH" == *"commit_hash.txt" ]]; then
+    EPD_UPDATED=true
+  fi
+done <<<"$FILES_CHANGED"
+
+# Making prefixes
 PREFIX=""
 if $CPLUSPLUS_MODIFIED; then
     PREFIX="[C++] " 
 fi
 if $CPLUSPLUS_NEW; then
-    PREFIX="[C++ *Regenerate] "
-fi
-if $SM_UPDATED; then
-    PREFIX="[SM] "
+  PREFIX+="[C++ *Regenerate] "
+elif $CPLUSPLUS_MODIFIED; then
+  PREFIX+="[C++] "
 fi
 
-# Добавляем префикс к сообщению, если нужно
+if $EPD_UPDATED; then
+  PREFIX+="[EPD] "
+fi
+
+# Deleting old prefix if it exists
+sed -i 's/\[[^]]*\]*//g' "$COMMIT_MSG_FILE"
+# Trim leading and trailing spaces
+sed -i 's/^ *//; s/ *$//' "$COMMIT_MSG_FILE"
+
+# Add prefix to a message if needed
 if [[ -n "$PREFIX" ]]; then
-    sed -i "1s/^/$PREFIX/" "$COMMIT_MSG_FILE"
+  sed -i "1s/^/$PREFIX/" "$COMMIT_MSG_FILE"
 fi

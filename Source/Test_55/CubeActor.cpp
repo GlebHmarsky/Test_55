@@ -15,6 +15,7 @@ ACubeActor::ACubeActor()
 void ACubeActor::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 }
 
